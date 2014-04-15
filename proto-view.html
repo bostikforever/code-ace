@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>
+            Bug Fixing Proto
+        </title>
+        <script src="editor.js" type="text/javascript" charset="utf-8"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="ace.js" type="text/javascript" charset="utf-8"></script>
+        <script src="diff.js" type="text/javascript" charset="utf-8"></script>
+        <script src="bugfixing_ui.js" type="text/javascript" charset="utf-8"></script>
+        <style type="text/css" media="screen">
+            body {
+                /*overflow: hidden;*/
+            }
+
+            .ace, .ace-diff {
+                margin: 0;
+                position: absolute;
+                top: 50px;
+                bottom: 0;
+                right: 0;
+                width:550px;
+            }
+            .ace-diff{
+                left: 550px;
+            }
+            .ace{
+
+                left:0;
+            }
+            .highlight-red{
+                position:absolute;
+                background:rgba(200,0,0,0.5);
+                z-index:20
+            }
+            .hightlight-green{
+                position:absolute;
+                background:rgba(0, 200, 0,0.5);
+                z-index:20
+            }
+            .ace-diff > .ace_scrollbar {
+                display: none !important;
+            }
+
+        </style>
+
+    </head>
+    <body>
+        <div id = "configure">
+            <span>Template File</span><input type="file" id="file" name="file"/>
+        </div>
+        <textarea name="solution" id="solution" ></textarea>
+        <script >
+            var ui = bugFixingUI({"readOnlyLines": [1]});
+            ui.init();
+            function handleFileSelect(evt) {
+                var file = evt.target.files[0];
+                var reader = new FileReader();
+                // Closure to capture the file information.
+                reader.onload = (function(theFile) {
+                return function(e) {
+                  //console.log(e.target.result)
+                  ui.editor.setTemplate(e.target.result);
+                  ui.editor.setValue(e.target.result);
+                };
+                })(file);
+                reader.readAsText(file);
+            }
+            document.getElementById('file').addEventListener('change', handleFileSelect, false);
+        </script>
+    </body>
+</html>
