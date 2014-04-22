@@ -19,12 +19,11 @@ function bugFixingUI(options){
     self.setupEditor = function() {
         self.editor = AceEditor();
         self.editor.onChangeEvent(self.updateModified);
-        //readOnlyLines is an array of line numbers we can't read
-        readOnlyLines = self.getOption("readOnlyLines");
-        if (readOnlyLines){
-            self.editor.setReadOnlyLines(readOnlyLines);
+        readOnlyRegions = self.getOption("readOnlyRegions");
+        if (readOnlyRegions){
+            self.editor.setReadOnlyRegions(readOnlyRegions);
         }
-        self.editor.enforceNoNewLinesKeyboardHandler();
+        self.editor.setNoNewLines(true);
     };
 
     self.init = function(){

@@ -52,7 +52,23 @@
         </div>
         <textarea name="solution" id="solution" ></textarea>
         <script >
-            var ui = bugFixingUI({"readOnlyLines": [1]});
+            var ui = bugFixingUI({"readOnlyRegions": [
+                {"start":
+                    {"row": 0,
+                    "column": 0
+                    }
+                    //without end specified, the range ends at the end of the row
+                },
+                {"start":
+                    {"row": 2,
+                    "column": 2
+                    },
+                "end":
+                    {"row": 2,
+                    "column": 10
+                    }
+                },
+                ]});
             ui.init();
             function handleFileSelect(evt) {
                 var file = evt.target.files[0];
