@@ -3,10 +3,11 @@
  * Makes use of Line Widgets
  * Inspired by https://github.com/ajaxorg/ace/blob/master/lib/ace/ext/error_marker.js
  */
-ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', 'ace/lib/dom'], function(require, exports, module) {
+ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'ace/lib/dom', 'ace/range'], function(require, exports, module) {
     "use strict";
     var LineWidgets = require("ace/line_widgets").LineWidgets;
     var dom = require("ace/lib/dom");
+    var Range = require("ace/range").Range;
 
     exports.DiffShower = function(editor, options) {
         var self = {}
@@ -26,9 +27,23 @@ ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', '
                 self.editor.ace.off('changeSelection', self.onSelectionChange);
             }
         }
+        self.markers = [];
         self.onDocumentChange = function() {
             self.diff = self._calculateDiff();
-            self.onSelectionChange(); //investigate because document change almost always implies selection change
+            //remove previous markers
+            if (self.markers.length) {
+                $.each(self.markers, function(idx, val) {
+                    self.editor.ace.session.removeMarker(val);
+                })
+            }
+            //add new markers
+            var diff_keys = Object.keys(self.diff);
+            if (diff_keys.length) {
+                //decorate appropraite lines as green and red
+                $.each(diff_keys, function(idx, line) {
+                    self.markers.push(self.editor.ace.session.addMarker(new Range(line, 0, line, 1), "hightlight-green", "fullLine"));
+                });
+            }
             //this is where we would handle highlighting as we did in "showDiffs" i.e. if we are to handle it
         }
         self.onSelectionChange = function() {
@@ -56,7 +71,7 @@ ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', '
                 w = {
                     row: row,
                     fixedWidth: true,
-                    coverGutter: false,
+                    coverGutter: true,
                     el: dom.createElement("div")
                 };
 
@@ -64,8 +79,7 @@ ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', '
                 var arrow = w.el.appendChild(dom.createElement("div"));
                 if (className) {
                     arrow.className = "error_widget_arrow " + className;
-                }
-                else{
+                } else {
                     arrow.className = "error_widget_arrow ace_error";
                 }
                 var left = self.editor.ace.renderer.$cursorLayer.getPixelPosition(position).left;
@@ -74,8 +88,7 @@ ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', '
                 w.el.className = "error_widget_wrapper";
                 if (className) {
                     el.className = "error_widget " + className;
-                }
-                else{
+                } else {
                     el.className = "error_widget ace_error";
                 }
                 el.innerHTML = self.template_lines[row] //always a single line
@@ -84,12 +97,19 @@ ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', '
                 //widget should self distruct if selection/session changes
                 w.destroy = function() {
                     self.session.widgetManager.removeLineWidget(w);
-                    self.editor.ace.off("changeSelection", w.destroy);
+                    self.editor.ace.off("changeSelection", w.destroyOnExit);
                     self.editor.ace.off("changeSession", w.destroy);
                     self.editor.ace.off("change", w.destroy);
                 };
+                w.destroyOnExit = function() {
+                    var pos = self.editor.ace.getCursorPosition();
+                    var currentRow = pos.row;
+                    if (w.row != currentRow) {
+                        w.destroy();
+                    }
+                }
 
-                self.editor.ace.on("changeSelection", w.destroy);
+                self.editor.ace.on("changeSelection", w.destroyOnExit);
                 self.editor.ace.on("changeSession", w.destroy);
                 self.editor.ace.on("change", w.destroy);
             }
@@ -102,10 +122,10 @@ ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', '
              * as a side effect, cache current version of template and template_lines
              *
              */
-             var diff = {};
-             var template = self.editor.template;
-             var value = self.editor.getValue();
-             if (template) {
+            var diff = {};
+            var template = self.editor.template;
+            var value = self.editor.getValue();
+            if (template) {
                 var template_lines = Diff.splitLines(template);
                 var value_lines = Diff.splitLines(value);
                 var linesLength = Math.max(template_lines.length, value_lines.length);
@@ -135,7 +155,7 @@ ace.define('diffshower', ['require', 'exports', 'module' , 'ace/line_widgets', '
             border-top: solid 2px;\
             border-bottom: solid 2px;\
             margin: 5px 0;\
-            padding: 10px 40px;\
+            padding: 1px 0px 1px 50px;\
             white-space: pre-wrap;\
         }\
         .error_widget.ace_error, .error_widget_arrow.ace_error{\
