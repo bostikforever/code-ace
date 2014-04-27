@@ -54,7 +54,7 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
             if (currentRow in self.diff) {
                 var oldWidget = self.session.lineWidgets && self.session.lineWidgets[currentRow];
                 if (oldWidget) {
-                    oldWidget.destroy();
+                    oldWidget.destroy(true);
                 }
                 var widget = self._buildWidget(pos);
                 if (widget) {
@@ -95,9 +95,9 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 el.appendChild(dom.createElement("div"));
 
                 //widget should self distruct if selection/session changes
-                w.destroy = function() {
-                    if (self.editor.ace.$mouseHandler.isMousePressed)
-                        return;
+                w.destroy = function(ingoreMouse) {
+                    if (self.editor.ace.$mouseHandler.isMousePressed && !ingoreMouse)
+                         return;
                     self.session.widgetManager.removeLineWidget(w);
                     self.editor.ace.off("changeSelection", w.destroyOnExit);
                     self.editor.ace.off("mouseup", w.destroyOnExit);
