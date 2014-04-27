@@ -89,6 +89,8 @@ function AceEditor() {
         // Fall back to normal textarea-based Editor
         return self;
     }
+    self.diffshower = ace.require('diffshower').DiffShower(self);
+    self.diffshower.enable(true);
     self.Range = ace.require('ace/range').Range;
     self.Anchor = ace.require('ace/anchor').Anchor;
     self.HashHandler = ace.require("ace/keyboard/hash_handler").HashHandler
