@@ -96,8 +96,11 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
 
                 //widget should self distruct if selection/session changes
                 w.destroy = function() {
+                    if (self.editor.ace.$mouseHandler.isMousePressed)
+                        return;
                     self.session.widgetManager.removeLineWidget(w);
                     self.editor.ace.off("changeSelection", w.destroyOnExit);
+                    self.editor.ace.off("mouseup", w.destroyOnExit);
                     self.editor.ace.off("changeSession", w.destroy);
                     self.editor.ace.off("change", w.destroy);
                 };
@@ -108,7 +111,7 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                         w.destroy();
                     }
                 }
-
+                self.editor.ace.on("mouseup", w.destroyOnExit);
                 self.editor.ace.on("changeSelection", w.destroyOnExit);
                 self.editor.ace.on("changeSession", w.destroy);
                 self.editor.ace.on("change", w.destroy);
