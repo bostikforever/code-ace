@@ -41,7 +41,8 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
             if (diff_keys.length) {
                 //decorate appropraite lines as green and red
                 $.each(diff_keys, function(idx, line) {
-                    self.markers.push(self.editor.ace.session.addMarker(new Range(line, 0, line, 1), "hightlight-green", "fullLine"));
+                    var lineEnd = self.editor.ace.session.getLine(line).length;
+                    self.markers.push(self.editor.ace.session.addMarker(new Range(line, 0, line, lineEnd), "hightlight-green", "fullLine"));
                 });
             }
             //this is where we would handle highlighting as we did in "showDiffs" i.e. if we are to handle it
@@ -91,8 +92,8 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 } else {
                     el.className = "error_widget ace_error";
                 }
-                el.innerHTML = self.template_lines[row] //always a single line
-                el.appendChild(dom.createElement("div"));
+                el.innerHTML = self.template_lines[row];
+                el.style.paddingLeft = self.editor.ace.renderer.gutterWidth + self.editor.ace.renderer.$padding + "px";
 
                 //widget should self distruct if selection/session changes
                 w.destroy = function(ingoreMouse) {
