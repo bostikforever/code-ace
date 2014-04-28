@@ -92,7 +92,9 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 } else {
                     el.className = "error_widget ace_error";
                 }
-                el.innerHTML = self.template_lines[row];
+                var diffLine = self.template_lines[row];
+                var lineWidth = self.editor.ace.session.getScreenWidth()
+                el.innerHTML = diffLine.match(new RegExp('.{1,'+lineWidth+'}', 'g')).join("<br>");
                 el.style.paddingLeft = self.editor.ace.renderer.gutterWidth + self.editor.ace.renderer.$padding + "px";
 
                 //widget should self distruct if selection/session changes
