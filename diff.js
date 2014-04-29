@@ -23,7 +23,7 @@ Diff.splitLines = function(content) {
     // Trim spaces at the end of line
     content = content.replace(/ +$/mg, '');
 
-    return content.split(/\n/);
+    return content.split(/\r*\n/);
 
 };
 

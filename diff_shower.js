@@ -94,13 +94,13 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 }
                 var diffLine = self.template_lines[row];
                 var lineWidth = self.editor.ace.session.getScreenWidth()
-                el.innerHTML = diffLine.match(new RegExp('.{1,'+lineWidth+'}', 'g')).join("<br>");
+                el.innerHTML = self._renderTemplateLine(row);
                 el.style.paddingLeft = self.editor.ace.renderer.gutterWidth + self.editor.ace.renderer.$padding + "px";
 
                 //widget should self distruct if selection/session changes
                 w.destroy = function(ingoreMouse) {
                     if (self.editor.ace.$mouseHandler.isMousePressed && !ingoreMouse)
-                         return;
+                        return;
                     self.session.widgetManager.removeLineWidget(w);
                     self.editor.ace.off("changeSelection", w.destroyOnExit);
                     self.editor.ace.off("mouseup", w.destroyOnExit);
@@ -120,6 +120,32 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 self.editor.ace.on("change", w.destroy);
             }
             return w;
+        }
+        self._renderTemplateLine = function(row) {
+            var tokenizer = self.editor.ace.session.getMode().getTokenizer();
+            var row_text = self.template_lines[row];
+            var tokens = tokenizer.getLineTokens(row_text).tokens;
+            var stringBuilder = [];
+
+            if (tokens.length) {
+                var wrapLimit = self.editor.ace.session.getWrapLimit();
+                var tabSize = self.editor.ace.session.getTabSize();
+                var displayTokens = self.editor.ace.session.$getDisplayTokens(row_text);
+                var splits = self.editor.ace.session.$computeWrapSplits(displayTokens, wrapLimit, tabSize);
+                if (splits && splits.length)
+                    self.editor.ace.renderer.$textLayer.$renderWrappedLine(stringBuilder, tokens, splits, false);
+                else
+                    self.editor.ace.renderer.$textLayer.$renderSimpleLine(stringBuilder, tokens);
+
+                stringBuilder.unshift(
+                    "<div class='ace_line' style='height:",
+                    self.editor.ace.renderer.$textLayer.config.lineHeight, "px'>"
+                );
+                stringBuilder.unshift("<div class='ace_line_group' style='height:",
+                    self.editor.ace.renderer.$textLayer.config.lineHeight * (splits.length+1), "px'>")
+            }
+            stringBuilder.push("</div>", "</div>");
+            return stringBuilder.join("");
         }
         self._calculateDiff = function() {
             /**
