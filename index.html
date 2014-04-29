@@ -15,20 +15,14 @@
                 /*overflow: hidden;*/
             }
 
-            .ace, .ace-diff {
+            .ace{
                 margin: 0;
                 position: absolute;
                 top: 50px;
                 bottom: 0;
                 right: 0;
+                left: 0;
                 width:550px;
-            }
-            .ace-diff{
-                left: 550px;
-            }
-            .ace{
-
-                left:0;
             }
             .highlight-red{
                 position:absolute;
@@ -40,9 +34,6 @@
                 background:rgba(0, 200, 0,0.5);
                 z-index:20
             }
-            .ace-diff > .ace_scrollbar {
-                display: none !important;
-            }
 
         </style>
 
@@ -53,6 +44,7 @@
         </div>
         <textarea name="solution" id="solution" ></textarea>
         <script >
+        /* global bugFixingUI */
             var ui = bugFixingUI({"readOnlyRegions": [
                 {"start":
                     {"row": 0,
