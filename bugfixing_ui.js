@@ -1,17 +1,19 @@
+/* global AceEditor*/
 function bugFixingUI(options){
+    var self = {};
     self.options = options;
     self.getOption = function(option){
         if (typeof self.options !== "undefined"){
             if (option in self.options){
-                return self.options[option]
+                return self.options[option];
             }
         }
-        return null
-    }
+        return null;
+    };
     self.updateModified = function(){
         //console.log("changeEvent fired");
         //self.editor.ace.undo();
-    }
+    };
 
     self.onKeyPress = function(){
 
@@ -19,7 +21,7 @@ function bugFixingUI(options){
     self.setupEditor = function() {
         self.editor = AceEditor();
         self.editor.onChangeEvent(self.updateModified);
-        readOnlyRegions = self.getOption("readOnlyRegions");
+        var readOnlyRegions = self.getOption("readOnlyRegions");
         if (readOnlyRegions){
             self.editor.setReadOnlyRegions(readOnlyRegions);
         }

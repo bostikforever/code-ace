@@ -4,7 +4,7 @@
 
 
 /*mock Log object */
-doNothing = function() {};
+var doNothing = function() {};
 var Log = {
     error: doNothing,
     debug: doNothing
@@ -93,7 +93,7 @@ function AceEditor() {
     self.diffshower.enable(true);
     self.Range = ace.require('ace/range').Range;
     self.Anchor = ace.require('ace/anchor').Anchor;
-    self.HashHandler = ace.require("ace/keyboard/hash_handler").HashHandler
+    self.HashHandler = ace.require("ace/keyboard/hash_handler").HashHandler;
     var session = self.ace.getSession();
     session.setTabSize(4);
     session.setUseSoftTabs(true);
@@ -136,7 +136,7 @@ function AceEditor() {
             self.handleChange();
         if(self.readOnlyRanges){
             //atach document
-            doc = self.ace.getSession().getDocument();
+            var doc = self.ace.getSession().getDocument();
             $.each(self.readOnlyRanges, function(idx, value){
                 value.start.attach(doc);
                 value.end.attach(doc);
@@ -237,30 +237,30 @@ function AceEditor() {
         //this makes the assumpiton that the line is not empty
         $.each(regions, function(index, value) {
             if (value.start) {
-                var start = value.start
-                var end = {}
+                var start = value.start;
+                var end = {};
                 if (!value.end) {
-                    end['row'] = start['row'];
-                    end['column'] = self.ace.getSession().getDocument().getLine(start['row']).length;
+                    end.row = start.row;
+                    end.column = self.ace.getSession().getDocument().getLine(start.row).length;
                 } else {
-                    end = value.end
+                    end = value.end;
                 }
-                doc = self.ace.getSession().getDocument();
-                start_anchor = new self.Anchor(doc, start.row, start.column);
-                start_anchor.setPosition(start.row, start.column, true)
-                end_anchor = new self.Anchor(doc, end.row, end.column);
-                end_anchor.setPosition(end.row, end.column, true)
+                var doc = self.ace.getSession().getDocument();
+                var start_anchor = new self.Anchor(doc, start.row, start.column);
+                start_anchor.setPosition(start.row, start.column, true);
+                var end_anchor = new self.Anchor(doc, end.row, end.column);
+                end_anchor.setPosition(end.row, end.column, true);
                 self.readOnlyRanges.push({"start": start_anchor, "end": end_anchor});
             }
         });
-    }
+    };
     self.setNoNewLines = function(bool){
         self.noNewLines = Boolean(bool);
         if (self.noNewLines){
-            self.ace.keyBinding.addKeyboardHandler(self.keyHandlers.enterHandler)
+            self.ace.keyBinding.addKeyboardHandler(self.keyHandlers.enterHandler);
         }
         else{
-            self.ace.keyBinding.removeKeyboardHandler(self.keyHandlers.enterHandler)
+            self.ace.keyBinding.removeKeyboardHandler(self.keyHandlers.enterHandler);
         }
     };
     self.keyHandlers = {
@@ -276,7 +276,6 @@ function AceEditor() {
     };
     self.enforceReadOnlyRegions = function(e) {
         //check that ranges have been sent
-        var editor = e.editor;
         var command = e.command;
         var contains = false;
         var multiLineSelect = false;
@@ -300,7 +299,7 @@ function AceEditor() {
         else if(self.noNewLines){
             var currentCursor = self.ace.getCursorPosition();
             var rightEdge = currentCursor.column == self.ace.getSession().getLine(currentCursor.row).length;
-            var leftEdge = currentCursor.column == 0;
+            var leftEdge = currentCursor.column === 0;
             var stop = self.isPrevented(command)||self.isReturn(command) || (self.isDelete(command) && rightEdge) || (self.isBackspace(command) && leftEdge);
             if (stop){
                 //console.log(command);
@@ -310,9 +309,9 @@ function AceEditor() {
         }
     };
     self.inRange = function(range){ //check if the current range intersects with selection
-        sel = self.ace.getSession().getSelection().getRange();
-        start = range["start"];
-        end = range["end"];
+        var sel = self.ace.getSession().getSelection().getRange();
+        var start = range.start;
+        var end = range.end;
         range = new self.Range(start.row, start.column, end.row, end.column);
         return range.intersects(sel);
     };
@@ -323,7 +322,7 @@ function AceEditor() {
         return command.name in {"backspace":true,  "cut-or-delete":true, "removetolinestart":true, "removewordleft": true};
     };
     self.isReturn = function(command){
-        return command.name in {"return": true}
+        return command.name in {"return": true};
     };
     self.isPrevented = function(command){
         return command.name in {"cut":true,
@@ -333,7 +332,7 @@ function AceEditor() {
                                 "copylinesdown": true,
                                 "movelinesup": true,
                                 "movelinesdown" : true,
-                                "splitline" : true}
+                                "splitline" : true};
     };
     //self.ace.on('change', self.highlightDiff);
 

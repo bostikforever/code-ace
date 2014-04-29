@@ -1,3 +1,4 @@
+/*global ace, Diff*/
 /**
  * Implements inline showing of diffs
  * Makes use of Line Widgets
@@ -10,7 +11,7 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
     var Range = require("ace/range").Range;
 
     exports.DiffShower = function(editor, options) {
-        var self = {}
+        var self = {};
         self.options = options;
         self.editor = editor;
         self.session = self.editor.ace.session;
@@ -26,7 +27,7 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 self.editor.ace.off('change', self.onDocumentChange);
                 self.editor.ace.off('changeSelection', self.onSelectionChange);
             }
-        }
+        };
         self.markers = [];
         self.onDocumentChange = function() {
             self.diff = self._calculateDiff();
@@ -34,7 +35,7 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
             if (self.markers.length) {
                 $.each(self.markers, function(idx, val) {
                     self.editor.ace.session.removeMarker(val);
-                })
+                });
             }
             //add new markers
             var diff_keys = Object.keys(self.diff);
@@ -46,7 +47,7 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 });
             }
             //this is where we would handle highlighting as we did in "showDiffs" i.e. if we are to handle it
-        }
+        };
         self.onSelectionChange = function() {
             if (self.editor.ace.getSession().getSelection().isMultiLine() || !self.diff)
                 return;
@@ -62,10 +63,10 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                     self.editor.ace.session.widgetManager.addLineWidget(widget);
                 }
             }
-        }
+        };
         self._buildWidget = function(position) {
             //make some assertions
-            var row = position.row
+            var row = position.row;
             var w = null;
             var className = self.options && self.options.className;
             if (self.template_lines && self.template_lines.length > row) {
@@ -92,8 +93,6 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 } else {
                     el.className = "error_widget ace_error";
                 }
-                var diffLine = self.template_lines[row];
-                var lineWidth = self.editor.ace.session.getScreenWidth()
                 el.innerHTML = self._renderTemplateLine(row);
                 el.style.paddingLeft = self.editor.ace.renderer.gutterWidth + self.editor.ace.renderer.$padding + "px";
 
@@ -113,14 +112,14 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                     if (w.row != currentRow) {
                         w.destroy();
                     }
-                }
+                };
                 self.editor.ace.on("mouseup", w.destroyOnExit);
                 self.editor.ace.on("changeSelection", w.destroyOnExit);
                 self.editor.ace.on("changeSession", w.destroy);
                 self.editor.ace.on("change", w.destroy);
             }
             return w;
-        }
+        };
         self._renderTemplateLine = function(row) {
             var tokenizer = self.editor.ace.session.getMode().getTokenizer();
             var row_text = self.template_lines[row];
@@ -142,11 +141,11 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                     self.editor.ace.renderer.$textLayer.config.lineHeight, "px'>"
                 );
                 stringBuilder.unshift("<div class='ace_line_group' style='height:",
-                    self.editor.ace.renderer.$textLayer.config.lineHeight * (splits.length+1), "px'>")
+                    self.editor.ace.renderer.$textLayer.config.lineHeight * (splits.length+1), "px'>");
             }
             stringBuilder.push("</div>", "</div>");
             return stringBuilder.join("");
-        }
+        };
         self._calculateDiff = function() {
             /**
              * returns a list of lines that differ between the template and the original document
@@ -173,9 +172,9 @@ ace.define('diffshower', ['require', 'exports', 'module', 'ace/line_widgets', 'a
                 }
             }
             return diff;
-        }
+        };
         return self;
-    }
+    };
 
     dom.importCssString("\
         .error_widget_wrapper {\
